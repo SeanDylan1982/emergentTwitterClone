@@ -2,6 +2,30 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Root variables for theme colors */
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #16181c;
+  --bg-tertiary: #1c1f23;
+  --text-primary: #ffffff;
+  --text-secondary: #71767b;
+  --border-color: #2f3336;
+  --accent-color: #1d9bf0;
+  --hover-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Light theme variables */
+.light-theme {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #000000;
+  --text-secondary: #6c757d;
+  --border-color: #e1e8ed;
+  --accent-color: #1d9bf0;
+  --hover-color: rgba(0, 0, 0, 0.03);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -9,8 +33,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {
@@ -24,16 +49,29 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--text-secondary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--text-primary);
+}
+
+/* Light theme scrollbar */
+.light-theme::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.light-theme::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+}
+
+.light-theme::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
 }
 
 /* Smooth transitions */
@@ -43,7 +81,7 @@ code {
 
 /* Tweet hover effects */
 .tweet:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--hover-color);
 }
 
 /* Button hover effects */
@@ -56,7 +94,7 @@ code {
 input:focus, textarea:focus, button:focus {
   outline: none;
   ring: 2px;
-  ring-color: #1da1f2;
+  ring-color: var(--accent-color);
 }
 
 /* Animation for icons */
@@ -73,6 +111,37 @@ input:focus, textarea:focus, button:focus {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Theme toggle animation */
+@keyframes rotate-in {
+  from {
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes rotate-out {
+  from {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.theme-icon-enter {
+  animation: rotate-in 0.3s ease-in-out forwards;
+}
+
+.theme-icon-exit {
+  animation: rotate-out 0.3s ease-in-out forwards;
+}
+
 /* Custom gradient backgrounds */
 .bg-gradient-twitter {
   background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
@@ -80,13 +149,13 @@ input:focus, textarea:focus, button:focus {
 
 /* Text selection */
 ::selection {
-  background-color: #1da1f2;
+  background-color: var(--accent-color);
   color: white;
 }
 
 /* Loading states */
 .loading {
-  background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, transparent 63%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, transparent 37%, transparent 63%, var(--bg-secondary) 75%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
@@ -100,15 +169,28 @@ input:focus, textarea:focus, button:focus {
   }
 }
 
-/* Dark mode specific styles */
-.dark-mode {
-  --bg-primary: #000;
+/* Dark theme specific styles */
+.dark-theme {
+  --bg-primary: #000000;
   --bg-secondary: #16181c;
   --bg-tertiary: #1c1f23;
-  --text-primary: #e7e9ea;
+  --text-primary: #ffffff;
   --text-secondary: #71767b;
   --border-color: #2f3336;
   --accent-color: #1d9bf0;
+  --hover-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Light theme specific styles */
+.light-theme {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #000000;
+  --text-secondary: #6c757d;
+  --border-color: #e1e8ed;
+  --accent-color: #1d9bf0;
+  --hover-color: rgba(0, 0, 0, 0.03);
 }
 
 /* Mobile optimizations */
@@ -178,6 +260,42 @@ input:focus, textarea:focus, button:focus {
   }
 }
 
+/* Theme transition effects */
+.theme-transition {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme toggle button animations */
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-icon {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.theme-toggle-icon.rotating {
+  animation: spin 0.6s linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Better button focus for accessibility */
+button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
   .text-gray-500 {
@@ -186,6 +304,14 @@ input:focus, textarea:focus, button:focus {
   
   .border-gray-800 {
     border-color: #4b5563;
+  }
+  
+  .light-theme .text-gray-500 {
+    color: #4b5563;
+  }
+  
+  .light-theme .border-gray-200 {
+    border-color: #9ca3af;
   }
 }
 
@@ -196,6 +322,10 @@ input:focus, textarea:focus, button:focus {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  
+  .theme-toggle-icon {
+    transition: none !important;
+  }
 }
 
 /* Better focus visibility for accessibility */
@@ -203,7 +333,7 @@ input:focus, textarea:focus, button:focus {
   button:focus,
   input:focus,
   textarea:focus {
-    outline: 2px solid #1da1f2;
+    outline: 2px solid var(--accent-color);
     outline-offset: 2px;
   }
 }
@@ -241,7 +371,7 @@ input:focus, textarea:focus, button:focus {
 
 /* Loading skeleton for mobile */
 .mobile-skeleton {
-  background: linear-gradient(90deg, #1a1a1a 25%, transparent 37%, transparent 63%, #1a1a1a 75%);
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, transparent 37%, transparent 63%, var(--bg-secondary) 75%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
@@ -259,4 +389,61 @@ input:focus, textarea:focus, button:focus {
   .notch-safe {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
+}
+
+/* Theme-specific button styles */
+.light-theme .bg-gray-900 {
+  background-color: #f8f9fa;
+}
+
+.light-theme .text-gray-500 {
+  color: #6c757d;
+}
+
+.light-theme .border-gray-800 {
+  border-color: #e1e8ed;
+}
+
+.light-theme .hover\:bg-gray-900:hover {
+  background-color: #e9ecef;
+}
+
+.light-theme .hover\:bg-gray-800:hover {
+  background-color: #f8f9fa;
+}
+
+/* Ensure proper text contrast in light mode */
+.light-theme .text-white {
+  color: #000000;
+}
+
+.light-theme .text-gray-400 {
+  color: #6c757d;
+}
+
+/* Background colors for light theme */
+.light-theme .bg-black {
+  background-color: #ffffff;
+}
+
+.light-theme .bg-gray-950 {
+  background-color: #f8f9fa;
+}
+
+.light-theme .bg-gray-900 {
+  background-color: #e9ecef;
+}
+
+/* Border colors for light theme */
+.light-theme .border-gray-800 {
+  border-color: #e1e8ed;
+}
+
+.light-theme .divide-gray-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e1e8ed;
+}
+
+/* Smooth color transitions for theme changes */
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

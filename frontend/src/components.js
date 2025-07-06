@@ -109,8 +109,48 @@ export const PlusIcon = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
+export const SunIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+);
+
+export const MoonIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+);
+
+// Theme Toggle Component
+export const ThemeToggle = ({ isDark, onToggle, className = "" }) => {
+  return (
+    <button
+      onClick={onToggle}
+      className={`p-3 rounded-full transition-all duration-300 hover:scale-105 ${
+        isDark 
+          ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
+          : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+      } ${className}`}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      <div className="relative w-6 h-6">
+        <div className={`absolute inset-0 transition-all duration-300 ${
+          isDark ? 'opacity-100 rotate-0' : 'opacity-0 rotate-180'
+        }`}>
+          <SunIcon className="w-6 h-6" />
+        </div>
+        <div className={`absolute inset-0 transition-all duration-300 ${
+          isDark ? 'opacity-0 -rotate-180' : 'opacity-100 rotate-0'
+        }`}>
+          <MoonIcon className="w-6 h-6" />
+        </div>
+      </div>
+    </button>
+  );
+};
+
 // Mobile Bottom Navigation
-export const MobileBottomNav = ({ currentView, onNavigate, onCompose }) => {
+export const MobileBottomNav = ({ currentView, onNavigate, onCompose, isDark }) => {
   const navItems = [
     { icon: HomeIcon, label: 'Home', key: 'home' },
     { icon: SearchIcon, label: 'Search', key: 'explore' },
@@ -119,14 +159,22 @@ export const MobileBottomNav = ({ currentView, onNavigate, onCompose }) => {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50">
+    <div className={`lg:hidden fixed bottom-0 left-0 right-0 border-t z-50 ${
+      isDark 
+        ? 'bg-black border-gray-800' 
+        : 'bg-white border-gray-200'
+    }`}>
       <div className="flex justify-around items-center py-2">
         {navItems.map((item) => (
           <button
             key={item.key}
             onClick={() => onNavigate(item.key)}
             className={`flex flex-col items-center justify-center py-2 px-4 rounded-lg transition-colors ${
-              currentView === item.key ? 'text-blue-500' : 'text-gray-500 hover:text-white'
+              currentView === item.key 
+                ? 'text-blue-500' 
+                : isDark 
+                  ? 'text-gray-500 hover:text-white' 
+                  : 'text-gray-500 hover:text-gray-900'
             }`}
           >
             <item.icon className="w-6 h-6" />
@@ -145,7 +193,7 @@ export const MobileBottomNav = ({ currentView, onNavigate, onCompose }) => {
 };
 
 // Mobile Sidebar (Drawer)
-export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
+export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate, isDark, onThemeToggle }) => {
   const navItems = [
     { icon: HomeIcon, label: 'Home', key: 'home' },
     { icon: SearchIcon, label: 'Explore', key: 'explore' },
@@ -161,14 +209,26 @@ export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
   return (
     <div className="lg:hidden fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="absolute left-0 top-0 h-full w-80 bg-black border-r border-gray-800 p-4">
+      <div className={`absolute left-0 top-0 h-full w-80 border-r p-4 ${
+        isDark 
+          ? 'bg-black border-gray-800' 
+          : 'bg-white border-gray-200'
+      }`}>
         <div className="flex items-center justify-between mb-8">
-          <XIcon className="w-8 h-8" />
-          <button onClick={onClose} className="p-2 hover:bg-gray-900 rounded-full">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <XIcon className={`w-8 h-8 ${isDark ? 'text-white' : 'text-black'}`} />
+          <div className="flex items-center space-x-2">
+            <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
+            <button 
+              onClick={onClose} 
+              className={`p-2 rounded-full transition-colors ${
+                isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
         
         <nav className="space-y-2">
@@ -179,7 +239,11 @@ export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
                 onNavigate(item.key);
                 onClose();
               }}
-              className="flex items-center space-x-4 w-full p-3 rounded-full hover:bg-gray-900 transition-colors"
+              className={`flex items-center space-x-4 w-full p-3 rounded-full transition-colors ${
+                isDark 
+                  ? 'hover:bg-gray-900 text-white' 
+                  : 'hover:bg-gray-100 text-gray-900'
+              }`}
             >
               <item.icon className="w-6 h-6" />
               <span className="text-xl font-light">{item.label}</span>
@@ -195,8 +259,12 @@ export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
               className="w-10 h-10 rounded-full"
             />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold truncate">{currentUser.name}</p>
-              <p className="text-gray-500 truncate">@{currentUser.username}</p>
+              <p className={`font-semibold truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {currentUser.name}
+              </p>
+              <p className={`truncate ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+                @{currentUser.username}
+              </p>
             </div>
           </div>
         </div>
@@ -206,7 +274,7 @@ export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
 };
 
 // Desktop Sidebar Component
-export const Sidebar = ({ currentUser, onNavigate }) => {
+export const Sidebar = ({ currentUser, onNavigate, isDark, onThemeToggle }) => {
   const navItems = [
     { icon: HomeIcon, label: 'Home', key: 'home' },
     { icon: SearchIcon, label: 'Explore', key: 'explore' },
@@ -218,9 +286,14 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
   ];
 
   return (
-    <div className="hidden lg:block w-64 h-screen bg-black text-white p-4 fixed left-0 top-0 border-r border-gray-800">
-      <div className="flex items-center space-x-2 mb-8">
+    <div className={`hidden lg:block w-64 h-screen p-4 fixed left-0 top-0 border-r ${
+      isDark 
+        ? 'bg-black text-white border-gray-800' 
+        : 'bg-white text-gray-900 border-gray-200'
+    }`}>
+      <div className="flex items-center justify-between mb-8">
         <XIcon className="w-8 h-8" />
+        <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
       </div>
       
       <nav className="space-y-2">
@@ -228,7 +301,11 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
           <button
             key={item.key}
             onClick={() => onNavigate(item.key)}
-            className="flex items-center space-x-4 w-full p-3 rounded-full hover:bg-gray-900 transition-colors"
+            className={`flex items-center space-x-4 w-full p-3 rounded-full transition-colors ${
+              isDark 
+                ? 'hover:bg-gray-900' 
+                : 'hover:bg-gray-100'
+            }`}
           >
             <item.icon className="w-6 h-6" />
             <span className="text-xl font-light">{item.label}</span>
@@ -241,7 +318,11 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
       </button>
       
       <div className="absolute bottom-4 left-4 right-4">
-        <div className="flex items-center space-x-3 p-3 rounded-full hover:bg-gray-900 cursor-pointer transition-colors">
+        <div className={`flex items-center space-x-3 p-3 rounded-full cursor-pointer transition-colors ${
+          isDark 
+            ? 'hover:bg-gray-900' 
+            : 'hover:bg-gray-100'
+        }`}>
           <img 
             src={currentUser.avatar} 
             alt={currentUser.name} 
@@ -249,7 +330,9 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
           />
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">{currentUser.name}</p>
-            <p className="text-gray-500 truncate">@{currentUser.username}</p>
+            <p className={`truncate ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+              @{currentUser.username}
+            </p>
           </div>
           <DotsIcon className="w-5 h-5" />
         </div>
@@ -259,7 +342,7 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
 };
 
 // Tweet Composer Component
-export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
+export const TweetComposer = ({ currentUser, onTweet, isMobile = false, isDark }) => {
   const [tweetText, setTweetText] = useState('');
   const maxLength = 280;
 
@@ -271,7 +354,9 @@ export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
   };
 
   return (
-    <div className={`border-b border-gray-800 ${isMobile ? 'p-3' : 'p-4'}`}>
+    <div className={`border-b ${isMobile ? 'p-3' : 'p-4'} ${
+      isDark ? 'border-gray-800' : 'border-gray-200'
+    }`}>
       <div className="flex space-x-3">
         <img 
           src={currentUser.avatar} 
@@ -283,7 +368,11 @@ export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
             value={tweetText}
             onChange={(e) => setTweetText(e.target.value)}
             placeholder="What's happening?"
-            className={`w-full bg-transparent ${isMobile ? 'text-lg' : 'text-xl'} placeholder-gray-500 resize-none border-none outline-none`}
+            className={`w-full bg-transparent ${isMobile ? 'text-lg' : 'text-xl'} resize-none border-none outline-none ${
+              isDark 
+                ? 'text-white placeholder-gray-500' 
+                : 'text-gray-900 placeholder-gray-400'
+            }`}
             rows={isMobile ? "2" : "3"}
             maxLength={maxLength}
           />
@@ -302,7 +391,11 @@ export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${tweetText.length > maxLength * 0.9 ? 'text-red-500' : 'text-gray-500'}`}>
+              <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                tweetText.length > maxLength * 0.9 
+                  ? 'text-red-500' 
+                  : isDark ? 'text-gray-500' : 'text-gray-400'
+              }`}>
                 {maxLength - tweetText.length}
               </span>
               <button
@@ -321,7 +414,7 @@ export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
 };
 
 // Tweet Component
-export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile = false }) => {
+export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile = false, isDark }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(false);
   const [likesCount, setLikesCount] = useState(tweet.likes);
@@ -340,7 +433,11 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
   };
 
   return (
-    <div className={`border-b border-gray-800 ${isMobile ? 'p-3' : 'p-4'} hover:bg-gray-950 transition-colors cursor-pointer`}>
+    <div className={`border-b ${isMobile ? 'p-3' : 'p-4'} cursor-pointer transition-colors ${
+      isDark 
+        ? 'border-gray-800 hover:bg-gray-950' 
+        : 'border-gray-200 hover:bg-gray-50'
+    }`}>
       <div className="flex space-x-3">
         <img 
           src={tweet.user.avatar} 
@@ -349,14 +446,32 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
         />
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <span className={`font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>{tweet.user.name}</span>
+            <span className={`font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>
+              {tweet.user.name}
+            </span>
             {tweet.user.verified && <VerifiedIcon className="w-4 h-4 text-blue-500" />}
-            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>@{tweet.user.username}</span>
-            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>·</span>
-            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{tweet.time}</span>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+              isDark ? 'text-gray-500' : 'text-gray-400'
+            }`}>
+              @{tweet.user.username}
+            </span>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+              isDark ? 'text-gray-500' : 'text-gray-400'
+            }`}>
+              ·
+            </span>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+              isDark ? 'text-gray-500' : 'text-gray-400'
+            }`}>
+              {tweet.time}
+            </span>
           </div>
           
-          <p className={`text-white mb-3 leading-relaxed ${isMobile ? 'text-sm' : 'text-base'}`}>{tweet.content}</p>
+          <p className={`mb-3 leading-relaxed ${isMobile ? 'text-sm' : 'text-base'} ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>
+            {tweet.content}
+          </p>
           
           {tweet.image && (
             <div className="mb-3 rounded-2xl overflow-hidden">
@@ -371,7 +486,11 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
           <div className={`flex items-center justify-between ${isMobile ? 'max-w-xs' : 'max-w-md'} mt-4`}>
             <button 
               onClick={() => onReply(tweet.id)}
-              className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
+              className={`flex items-center space-x-2 transition-colors group ${
+                isDark 
+                  ? 'text-gray-500 hover:text-blue-500' 
+                  : 'text-gray-400 hover:text-blue-500'
+              }`}
             >
               <div className="p-2 rounded-full group-hover:bg-blue-900/20 transition-colors">
                 <ReplyIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -381,7 +500,13 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
             
             <button 
               onClick={handleRetweet}
-              className={`flex items-center space-x-2 transition-colors group ${isRetweeted ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
+              className={`flex items-center space-x-2 transition-colors group ${
+                isRetweeted 
+                  ? 'text-green-500' 
+                  : isDark 
+                    ? 'text-gray-500 hover:text-green-500' 
+                    : 'text-gray-400 hover:text-green-500'
+              }`}
             >
               <div className="p-2 rounded-full group-hover:bg-green-900/20 transition-colors">
                 <RetweetIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -391,7 +516,13 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
             
             <button 
               onClick={handleLike}
-              className={`flex items-center space-x-2 transition-colors group ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+              className={`flex items-center space-x-2 transition-colors group ${
+                isLiked 
+                  ? 'text-red-500' 
+                  : isDark 
+                    ? 'text-gray-500 hover:text-red-500' 
+                    : 'text-gray-400 hover:text-red-500'
+              }`}
             >
               <div className="p-2 rounded-full group-hover:bg-red-900/20 transition-colors">
                 <HeartIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} filled={isLiked} />
@@ -399,7 +530,11 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
               <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{likesCount}</span>
             </button>
             
-            <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
+            <button className={`flex items-center space-x-2 transition-colors group ${
+              isDark 
+                ? 'text-gray-500 hover:text-blue-500' 
+                : 'text-gray-400 hover:text-blue-500'
+            }`}>
               <div className="p-2 rounded-full group-hover:bg-blue-900/20 transition-colors">
                 <ShareIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </div>
@@ -412,24 +547,52 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile
 };
 
 // Right Sidebar Component
-export const RightSidebar = ({ trends, suggestions }) => {
+export const RightSidebar = ({ trends, suggestions, isDark }) => {
   return (
     <div className="hidden xl:block w-80 p-4 space-y-4">
-      <div className="bg-gray-900 rounded-2xl p-4">
-        <h2 className="text-xl font-bold mb-4">What's happening</h2>
+      <div className={`rounded-2xl p-4 ${
+        isDark ? 'bg-gray-900' : 'bg-gray-100'
+      }`}>
+        <h2 className={`text-xl font-bold mb-4 ${
+          isDark ? 'text-white' : 'text-gray-900'
+        }`}>
+          What's happening
+        </h2>
         <div className="space-y-3">
           {trends.map((trend, index) => (
-            <div key={index} className="hover:bg-gray-800 p-3 rounded-lg transition-colors cursor-pointer">
-              <p className="text-gray-500 text-sm">{trend.category}</p>
-              <p className="font-semibold">{trend.title}</p>
-              <p className="text-gray-500 text-sm">{trend.posts} posts</p>
+            <div key={index} className={`p-3 rounded-lg transition-colors cursor-pointer ${
+              isDark 
+                ? 'hover:bg-gray-800' 
+                : 'hover:bg-gray-200'
+            }`}>
+              <p className={`text-sm ${
+                isDark ? 'text-gray-500' : 'text-gray-400'
+              }`}>
+                {trend.category}
+              </p>
+              <p className={`font-semibold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}>
+                {trend.title}
+              </p>
+              <p className={`text-sm ${
+                isDark ? 'text-gray-500' : 'text-gray-400'
+              }`}>
+                {trend.posts} posts
+              </p>
             </div>
           ))}
         </div>
       </div>
       
-      <div className="bg-gray-900 rounded-2xl p-4">
-        <h2 className="text-xl font-bold mb-4">Who to follow</h2>
+      <div className={`rounded-2xl p-4 ${
+        isDark ? 'bg-gray-900' : 'bg-gray-100'
+      }`}>
+        <h2 className={`text-xl font-bold mb-4 ${
+          isDark ? 'text-white' : 'text-gray-900'
+        }`}>
+          Who to follow
+        </h2>
         <div className="space-y-3">
           {suggestions.map((user, index) => (
             <div key={index} className="flex items-center justify-between">
@@ -440,11 +603,23 @@ export const RightSidebar = ({ trends, suggestions }) => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="font-semibold">{user.name}</p>
-                  <p className="text-gray-500 text-sm">@{user.username}</p>
+                  <p className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {user.name}
+                  </p>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-500' : 'text-gray-400'
+                  }`}>
+                    @{user.username}
+                  </p>
                 </div>
               </div>
-              <button className="bg-white text-black px-4 py-1 rounded-full font-semibold hover:bg-gray-200 transition-colors">
+              <button className={`px-4 py-1 rounded-full font-semibold transition-colors ${
+                isDark 
+                  ? 'bg-white text-black hover:bg-gray-200' 
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+              }`}>
                 Follow
               </button>
             </div>
@@ -456,7 +631,7 @@ export const RightSidebar = ({ trends, suggestions }) => {
 };
 
 // Search Component
-export const SearchBar = ({ onSearch, isMobile = false }) => {
+export const SearchBar = ({ onSearch, isMobile = false, isDark }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSubmit = (e) => {
@@ -465,15 +640,23 @@ export const SearchBar = ({ onSearch, isMobile = false }) => {
   };
 
   return (
-    <div className={`sticky top-0 bg-black/80 backdrop-blur-md z-10 ${isMobile ? 'p-3' : 'p-4'}`}>
+    <div className={`sticky top-0 backdrop-blur-md z-10 ${isMobile ? 'p-3' : 'p-4'} ${
+      isDark ? 'bg-black/80' : 'bg-white/80'
+    }`}>
       <form onSubmit={handleSubmit} className="relative">
-        <SearchIcon className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 ${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
+        <SearchIcon className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${isMobile ? 'w-4 h-4' : 'w-5 h-5'} ${
+          isDark ? 'text-gray-500' : 'text-gray-400'
+        }`} />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search"
-          className={`w-full bg-gray-900 rounded-full ${isMobile ? 'py-2 pl-10 pr-4 text-sm' : 'py-3 pl-12 pr-4'} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-black transition-colors`}
+          className={`w-full rounded-full ${isMobile ? 'py-2 pl-10 pr-4 text-sm' : 'py-3 pl-12 pr-4'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+            isDark 
+              ? 'bg-gray-900 text-white placeholder-gray-500 focus:bg-black' 
+              : 'bg-gray-100 text-gray-900 placeholder-gray-400 focus:bg-white'
+          }`}
         />
       </form>
     </div>
@@ -481,14 +664,20 @@ export const SearchBar = ({ onSearch, isMobile = false }) => {
 };
 
 // Header Component
-export const Header = ({ title, showBackButton = false, onBack, onMenuClick, isMobile = false }) => {
+export const Header = ({ title, showBackButton = false, onBack, onMenuClick, isMobile = false, isDark }) => {
   return (
-    <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-gray-800">
+    <div className={`sticky top-0 backdrop-blur-md z-10 border-b ${
+      isDark 
+        ? 'bg-black/80 border-gray-800' 
+        : 'bg-white/80 border-gray-200'
+    }`}>
       <div className={`flex items-center ${isMobile ? 'p-3' : 'p-4'}`}>
         {isMobile && (
           <button 
             onClick={onMenuClick}
-            className="mr-4 p-2 rounded-full hover:bg-gray-900 transition-colors lg:hidden"
+            className={`mr-4 p-2 rounded-full transition-colors lg:hidden ${
+              isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+            }`}
           >
             <MenuIcon className="w-5 h-5" />
           </button>
@@ -496,31 +685,49 @@ export const Header = ({ title, showBackButton = false, onBack, onMenuClick, isM
         {showBackButton && (
           <button 
             onClick={onBack}
-            className="mr-4 p-2 rounded-full hover:bg-gray-900 transition-colors"
+            className={`mr-4 p-2 rounded-full transition-colors ${
+              isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
         )}
-        <h1 className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>{title}</h1>
+        <h1 className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} ${
+          isDark ? 'text-white' : 'text-gray-900'
+        }`}>
+          {title}
+        </h1>
       </div>
     </div>
   );
 };
 
 // Modal Component
-export const Modal = ({ isOpen, onClose, children }) => {
+export const Modal = ({ isOpen, onClose, children, isDark }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-black border border-gray-800 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Compose post</h2>
+      <div className={`border rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto ${
+        isDark 
+          ? 'bg-black border-gray-800' 
+          : 'bg-white border-gray-200'
+      }`}>
+        <div className={`p-4 border-b flex justify-between items-center ${
+          isDark ? 'border-gray-800' : 'border-gray-200'
+        }`}>
+          <h2 className={`text-xl font-bold ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>
+            Compose post
+          </h2>
           <button 
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-900 transition-colors"
+            className={`p-2 rounded-full transition-colors ${
+              isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
