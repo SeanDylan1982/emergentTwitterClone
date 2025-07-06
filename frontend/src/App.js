@@ -19,6 +19,7 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   // Mock data for current user
   const currentUser = {
@@ -151,6 +152,20 @@ const App = () => {
     }
   ];
 
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setIsDark(savedTheme === 'dark');
+    }
+  }, []);
+
+  // Save theme to localStorage and update body class
+  useEffect(() => {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.body.className = isDark ? 'dark-theme' : 'light-theme';
+  }, [isDark]);
+
   // Check if mobile on mount and window resize
   useEffect(() => {
     const checkMobile = () => {
@@ -218,6 +233,10 @@ const App = () => {
     setShowModal(true);
   };
 
+  const handleThemeToggle = () => {
+    setIsDark(!isDark);
+  };
+
   const renderMainContent = () => {
     switch (currentView) {
       case 'home':
@@ -227,9 +246,14 @@ const App = () => {
               title="Home" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             {!isMobile && (
-              <TweetComposer currentUser={currentUser} onTweet={handleTweet} />
+              <TweetComposer 
+                currentUser={currentUser} 
+                onTweet={handleTweet} 
+                isDark={isDark}
+              />
             )}
             <div className="divide-y divide-gray-800">
               {tweets.map(tweet => (
@@ -241,6 +265,7 @@ const App = () => {
                   onRetweet={handleRetweet}
                   onReply={handleReply}
                   isMobile={isMobile}
+                  isDark={isDark}
                 />
               ))}
             </div>
@@ -249,20 +274,45 @@ const App = () => {
       case 'explore':
         return (
           <div className="min-h-screen pb-20 lg:pb-0">
-            <SearchBar onSearch={handleSearch} isMobile={isMobile} />
+            <SearchBar 
+              onSearch={handleSearch} 
+              isMobile={isMobile}
+              isDark={isDark}
+            />
             <Header 
               title="Explore" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
-              <h2 className={`font-bold mb-4 ${isMobile ? 'text-xl' : 'text-2xl'}`}>Trending now</h2>
+              <h2 className={`font-bold mb-4 ${isMobile ? 'text-xl' : 'text-2xl'} ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}>
+                Trending now
+              </h2>
               <div className="space-y-4">
                 {trendingTopics.map((trend, index) => (
-                  <div key={index} className={`${isMobile ? 'p-3' : 'p-4'} border border-gray-800 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer`}>
-                    <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{trend.category}</p>
-                    <h3 className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>{trend.title}</h3>
-                    <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{trend.posts} posts</p>
+                  <div key={index} className={`${isMobile ? 'p-3' : 'p-4'} border rounded-lg cursor-pointer transition-colors ${
+                    isDark 
+                      ? 'border-gray-800 hover:bg-gray-900' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}>
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                      isDark ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
+                      {trend.category}
+                    </p>
+                    <h3 className={`font-bold ${isMobile ? 'text-base' : 'text-lg'} ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {trend.title}
+                    </h3>
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                      isDark ? 'text-gray-500' : 'text-gray-400'
+                    }`}>
+                      {trend.posts} posts
+                    </p>
                   </div>
                 ))}
               </div>
@@ -276,9 +326,12 @@ const App = () => {
               title="Notifications" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
-              <p className="text-gray-500">No new notifications</p>
+              <p className={isDark ? 'text-gray-500' : 'text-gray-400'}>
+                No new notifications
+              </p>
             </div>
           </div>
         );
@@ -289,9 +342,12 @@ const App = () => {
               title="Messages" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
-              <p className="text-gray-500">No messages yet</p>
+              <p className={isDark ? 'text-gray-500' : 'text-gray-400'}>
+                No messages yet
+              </p>
             </div>
           </div>
         );
@@ -302,9 +358,12 @@ const App = () => {
               title="Bookmarks" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
-              <p className="text-gray-500">No bookmarks yet</p>
+              <p className={isDark ? 'text-gray-500' : 'text-gray-400'}>
+                No bookmarks yet
+              </p>
             </div>
           </div>
         );
@@ -315,6 +374,7 @@ const App = () => {
               title="Profile" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center space-x-4 mb-6">
@@ -324,22 +384,54 @@ const App = () => {
                   className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full`}
                 />
                 <div>
-                  <h2 className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl'}`}>{currentUser.name}</h2>
-                  <p className={`text-gray-500 ${isMobile ? 'text-sm' : 'text-base'}`}>@{currentUser.username}</p>
+                  <h2 className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl'} ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {currentUser.name}
+                  </h2>
+                  <p className={`${isMobile ? 'text-sm' : 'text-base'} ${
+                    isDark ? 'text-gray-500' : 'text-gray-600'
+                  }`}>
+                    @{currentUser.username}
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>123</p>
-                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Following</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'} ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    123
+                  </p>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                    isDark ? 'text-gray-500' : 'text-gray-600'
+                  }`}>
+                    Following
+                  </p>
                 </div>
                 <div className="text-center">
-                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>456</p>
-                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Followers</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'} ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    456
+                  </p>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                    isDark ? 'text-gray-500' : 'text-gray-600'
+                  }`}>
+                    Followers
+                  </p>
                 </div>
                 <div className="text-center">
-                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>789</p>
-                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Posts</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'} ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    789
+                  </p>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} ${
+                    isDark ? 'text-gray-500' : 'text-gray-600'
+                  }`}>
+                    Posts
+                  </p>
                 </div>
               </div>
             </div>
@@ -352,9 +444,12 @@ const App = () => {
               title="Home" 
               onMenuClick={handleMenuClick} 
               isMobile={isMobile}
+              isDark={isDark}
             />
             <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
-              <p className="text-gray-500">Coming soon...</p>
+              <p className={isDark ? 'text-gray-500' : 'text-gray-400'}>
+                Coming soon...
+              </p>
             </div>
           </div>
         );
@@ -363,12 +458,16 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="bg-black text-white min-h-screen">
+      <div className={`min-h-screen transition-colors duration-300 ${
+        isDark ? 'bg-black text-white' : 'bg-white text-gray-900'
+      }`}>
         <div className="max-w-6xl mx-auto flex">
           {/* Desktop Sidebar */}
           <Sidebar 
             currentUser={currentUser} 
             onNavigate={handleNavigation}
+            isDark={isDark}
+            onThemeToggle={handleThemeToggle}
           />
           
           {/* Mobile Sidebar */}
@@ -377,10 +476,14 @@ const App = () => {
             onClose={() => setShowMobileSidebar(false)}
             currentUser={currentUser}
             onNavigate={handleNavigation}
+            isDark={isDark}
+            onThemeToggle={handleThemeToggle}
           />
           
           {/* Main Content */}
-          <main className={`flex-1 ${isMobile ? 'w-full' : 'lg:ml-64 xl:mr-80'} ${!isMobile ? 'border-x border-gray-800' : ''}`}>
+          <main className={`flex-1 ${isMobile ? 'w-full' : 'lg:ml-64 xl:mr-80'} ${
+            !isMobile ? (isDark ? 'border-x border-gray-800' : 'border-x border-gray-200') : ''
+          }`}>
             <Routes>
               <Route path="/" element={renderMainContent()} />
               <Route path="/explore" element={renderMainContent()} />
@@ -396,6 +499,7 @@ const App = () => {
             <RightSidebar 
               trends={trendingTopics}
               suggestions={followSuggestions}
+              isDark={isDark}
             />
           </aside>
         </div>
@@ -405,11 +509,21 @@ const App = () => {
           currentView={currentView}
           onNavigate={handleNavigation}
           onCompose={handleCompose}
+          isDark={isDark}
         />
 
         {/* Compose Modal */}
-        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <TweetComposer currentUser={currentUser} onTweet={handleTweet} isMobile={isMobile} />
+        <Modal 
+          isOpen={showModal} 
+          onClose={() => setShowModal(false)}
+          isDark={isDark}
+        >
+          <TweetComposer 
+            currentUser={currentUser} 
+            onTweet={handleTweet} 
+            isMobile={isMobile}
+            isDark={isDark}
+          />
         </Modal>
       </div>
     </BrowserRouter>
