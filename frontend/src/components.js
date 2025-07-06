@@ -97,7 +97,115 @@ export const VerifiedIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
-// Sidebar Component
+export const MenuIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
+export const PlusIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+  </svg>
+);
+
+// Mobile Bottom Navigation
+export const MobileBottomNav = ({ currentView, onNavigate, onCompose }) => {
+  const navItems = [
+    { icon: HomeIcon, label: 'Home', key: 'home' },
+    { icon: SearchIcon, label: 'Search', key: 'explore' },
+    { icon: BellIcon, label: 'Notifications', key: 'notifications' },
+    { icon: MailIcon, label: 'Messages', key: 'messages' },
+  ];
+
+  return (
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50">
+      <div className="flex justify-around items-center py-2">
+        {navItems.map((item) => (
+          <button
+            key={item.key}
+            onClick={() => onNavigate(item.key)}
+            className={`flex flex-col items-center justify-center py-2 px-4 rounded-lg transition-colors ${
+              currentView === item.key ? 'text-blue-500' : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            <item.icon className="w-6 h-6" />
+            <span className="text-xs mt-1">{item.label}</span>
+          </button>
+        ))}
+        <button
+          onClick={onCompose}
+          className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition-colors"
+        >
+          <PlusIcon className="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Mobile Sidebar (Drawer)
+export const MobileSidebar = ({ isOpen, onClose, currentUser, onNavigate }) => {
+  const navItems = [
+    { icon: HomeIcon, label: 'Home', key: 'home' },
+    { icon: SearchIcon, label: 'Explore', key: 'explore' },
+    { icon: BellIcon, label: 'Notifications', key: 'notifications' },
+    { icon: MailIcon, label: 'Messages', key: 'messages' },
+    { icon: BookmarkIcon, label: 'Bookmarks', key: 'bookmarks' },
+    { icon: UserIcon, label: 'Profile', key: 'profile' },
+    { icon: DotsIcon, label: 'More', key: 'more' },
+  ];
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="lg:hidden fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute left-0 top-0 h-full w-80 bg-black border-r border-gray-800 p-4">
+        <div className="flex items-center justify-between mb-8">
+          <XIcon className="w-8 h-8" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-900 rounded-full">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <nav className="space-y-2">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => {
+                onNavigate(item.key);
+                onClose();
+              }}
+              className="flex items-center space-x-4 w-full p-3 rounded-full hover:bg-gray-900 transition-colors"
+            >
+              <item.icon className="w-6 h-6" />
+              <span className="text-xl font-light">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+        
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="flex items-center space-x-3 p-3 rounded-full">
+            <img 
+              src={currentUser.avatar} 
+              alt={currentUser.name} 
+              className="w-10 h-10 rounded-full"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold truncate">{currentUser.name}</p>
+              <p className="text-gray-500 truncate">@{currentUser.username}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Desktop Sidebar Component
 export const Sidebar = ({ currentUser, onNavigate }) => {
   const navItems = [
     { icon: HomeIcon, label: 'Home', key: 'home' },
@@ -110,7 +218,7 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
   ];
 
   return (
-    <div className="w-64 h-screen bg-black text-white p-4 fixed left-0 top-0 border-r border-gray-800">
+    <div className="hidden lg:block w-64 h-screen bg-black text-white p-4 fixed left-0 top-0 border-r border-gray-800">
       <div className="flex items-center space-x-2 mb-8">
         <XIcon className="w-8 h-8" />
       </div>
@@ -151,7 +259,7 @@ export const Sidebar = ({ currentUser, onNavigate }) => {
 };
 
 // Tweet Composer Component
-export const TweetComposer = ({ currentUser, onTweet }) => {
+export const TweetComposer = ({ currentUser, onTweet, isMobile = false }) => {
   const [tweetText, setTweetText] = useState('');
   const maxLength = 280;
 
@@ -163,44 +271,44 @@ export const TweetComposer = ({ currentUser, onTweet }) => {
   };
 
   return (
-    <div className="border-b border-gray-800 p-4">
-      <div className="flex space-x-4">
+    <div className={`border-b border-gray-800 ${isMobile ? 'p-3' : 'p-4'}`}>
+      <div className="flex space-x-3">
         <img 
           src={currentUser.avatar} 
           alt={currentUser.name} 
-          className="w-12 h-12 rounded-full"
+          className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full`}
         />
         <div className="flex-1">
           <textarea
             value={tweetText}
             onChange={(e) => setTweetText(e.target.value)}
             placeholder="What's happening?"
-            className="w-full bg-transparent text-xl placeholder-gray-500 resize-none border-none outline-none"
-            rows="3"
+            className={`w-full bg-transparent ${isMobile ? 'text-lg' : 'text-xl'} placeholder-gray-500 resize-none border-none outline-none`}
+            rows={isMobile ? "2" : "3"}
             maxLength={maxLength}
           />
           
           <div className="flex items-center justify-between mt-4">
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <button className="text-blue-500 hover:text-blue-400 transition-colors">
-                <ImageIcon className="w-5 h-5" />
+                <ImageIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </button>
               <button className="text-blue-500 hover:text-blue-400 transition-colors">
-                <EmojiIcon className="w-5 h-5" />
+                <EmojiIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </button>
               <button className="text-blue-500 hover:text-blue-400 transition-colors">
-                <CalendarIcon className="w-5 h-5" />
+                <CalendarIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </button>
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className={`text-sm ${tweetText.length > maxLength * 0.9 ? 'text-red-500' : 'text-gray-500'}`}>
+              <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${tweetText.length > maxLength * 0.9 ? 'text-red-500' : 'text-gray-500'}`}>
                 {maxLength - tweetText.length}
               </span>
               <button
                 onClick={handleTweet}
                 disabled={!tweetText.trim() || tweetText.length > maxLength}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-2 px-6 rounded-full transition-colors"
+                className={`bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold ${isMobile ? 'py-1 px-4 text-sm' : 'py-2 px-6'} rounded-full transition-colors`}
               >
                 Post
               </button>
@@ -213,7 +321,7 @@ export const TweetComposer = ({ currentUser, onTweet }) => {
 };
 
 // Tweet Component
-export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
+export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply, isMobile = false }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(false);
   const [likesCount, setLikesCount] = useState(tweet.likes);
@@ -232,23 +340,23 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
   };
 
   return (
-    <div className="border-b border-gray-800 p-4 hover:bg-gray-950 transition-colors cursor-pointer">
+    <div className={`border-b border-gray-800 ${isMobile ? 'p-3' : 'p-4'} hover:bg-gray-950 transition-colors cursor-pointer`}>
       <div className="flex space-x-3">
         <img 
           src={tweet.user.avatar} 
           alt={tweet.user.name} 
-          className="w-12 h-12 rounded-full"
+          className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full`}
         />
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <span className="font-bold">{tweet.user.name}</span>
-            {tweet.user.verified && <VerifiedIcon className="w-5 h-5 text-blue-500" />}
-            <span className="text-gray-500">@{tweet.user.username}</span>
-            <span className="text-gray-500">·</span>
-            <span className="text-gray-500">{tweet.time}</span>
+            <span className={`font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>{tweet.user.name}</span>
+            {tweet.user.verified && <VerifiedIcon className="w-4 h-4 text-blue-500" />}
+            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>@{tweet.user.username}</span>
+            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>·</span>
+            <span className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{tweet.time}</span>
           </div>
           
-          <p className="text-white mb-3 leading-relaxed">{tweet.content}</p>
+          <p className={`text-white mb-3 leading-relaxed ${isMobile ? 'text-sm' : 'text-base'}`}>{tweet.content}</p>
           
           {tweet.image && (
             <div className="mb-3 rounded-2xl overflow-hidden">
@@ -260,15 +368,15 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
             </div>
           )}
           
-          <div className="flex items-center justify-between max-w-md mt-4">
+          <div className={`flex items-center justify-between ${isMobile ? 'max-w-xs' : 'max-w-md'} mt-4`}>
             <button 
               onClick={() => onReply(tweet.id)}
               className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
             >
               <div className="p-2 rounded-full group-hover:bg-blue-900/20 transition-colors">
-                <ReplyIcon className="w-5 h-5" />
+                <ReplyIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </div>
-              <span className="text-sm">{tweet.replies}</span>
+              <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{tweet.replies}</span>
             </button>
             
             <button 
@@ -276,9 +384,9 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
               className={`flex items-center space-x-2 transition-colors group ${isRetweeted ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
             >
               <div className="p-2 rounded-full group-hover:bg-green-900/20 transition-colors">
-                <RetweetIcon className="w-5 h-5" />
+                <RetweetIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </div>
-              <span className="text-sm">{retweetsCount}</span>
+              <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{retweetsCount}</span>
             </button>
             
             <button 
@@ -286,14 +394,14 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
               className={`flex items-center space-x-2 transition-colors group ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
             >
               <div className="p-2 rounded-full group-hover:bg-red-900/20 transition-colors">
-                <HeartIcon className="w-5 h-5" filled={isLiked} />
+                <HeartIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} filled={isLiked} />
               </div>
-              <span className="text-sm">{likesCount}</span>
+              <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{likesCount}</span>
             </button>
             
             <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
               <div className="p-2 rounded-full group-hover:bg-blue-900/20 transition-colors">
-                <ShareIcon className="w-5 h-5" />
+                <ShareIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               </div>
             </button>
           </div>
@@ -306,7 +414,7 @@ export const Tweet = ({ tweet, currentUser, onLike, onRetweet, onReply }) => {
 // Right Sidebar Component
 export const RightSidebar = ({ trends, suggestions }) => {
   return (
-    <div className="w-80 p-4 space-y-4">
+    <div className="hidden xl:block w-80 p-4 space-y-4">
       <div className="bg-gray-900 rounded-2xl p-4">
         <h2 className="text-xl font-bold mb-4">What's happening</h2>
         <div className="space-y-3">
@@ -348,7 +456,7 @@ export const RightSidebar = ({ trends, suggestions }) => {
 };
 
 // Search Component
-export const SearchBar = ({ onSearch }) => {
+export const SearchBar = ({ onSearch, isMobile = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSubmit = (e) => {
@@ -357,15 +465,15 @@ export const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 p-4">
+    <div className={`sticky top-0 bg-black/80 backdrop-blur-md z-10 ${isMobile ? 'p-3' : 'p-4'}`}>
       <form onSubmit={handleSubmit} className="relative">
-        <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+        <SearchIcon className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 ${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search"
-          className="w-full bg-gray-900 rounded-full py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-black transition-colors"
+          className={`w-full bg-gray-900 rounded-full ${isMobile ? 'py-2 pl-10 pr-4 text-sm' : 'py-3 pl-12 pr-4'} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-black transition-colors`}
         />
       </form>
     </div>
@@ -373,10 +481,18 @@ export const SearchBar = ({ onSearch }) => {
 };
 
 // Header Component
-export const Header = ({ title, showBackButton = false, onBack }) => {
+export const Header = ({ title, showBackButton = false, onBack, onMenuClick, isMobile = false }) => {
   return (
     <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-gray-800">
-      <div className="flex items-center p-4">
+      <div className={`flex items-center ${isMobile ? 'p-3' : 'p-4'}`}>
+        {isMobile && (
+          <button 
+            onClick={onMenuClick}
+            className="mr-4 p-2 rounded-full hover:bg-gray-900 transition-colors lg:hidden"
+          >
+            <MenuIcon className="w-5 h-5" />
+          </button>
+        )}
         {showBackButton && (
           <button 
             onClick={onBack}
@@ -387,7 +503,7 @@ export const Header = ({ title, showBackButton = false, onBack }) => {
             </svg>
           </button>
         )}
-        <h1 className="text-xl font-bold">{title}</h1>
+        <h1 className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>{title}</h1>
       </div>
     </div>
   );
@@ -398,8 +514,8 @@ export const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-black border border-gray-800 rounded-2xl max-w-lg w-full m-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-black border border-gray-800 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 border-b border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-bold">Compose post</h2>
           <button 

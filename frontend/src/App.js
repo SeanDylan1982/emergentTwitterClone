@@ -3,6 +3,8 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import {
   Sidebar,
+  MobileSidebar,
+  MobileBottomNav,
   TweetComposer,
   Tweet,
   RightSidebar,
@@ -15,6 +17,8 @@ const App = () => {
   const [currentView, setCurrentView] = useState('home');
   const [tweets, setTweets] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Mock data for current user
   const currentUser = {
@@ -147,6 +151,18 @@ const App = () => {
     }
   ];
 
+  // Check if mobile on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     setTweets(mockTweets);
   }, []);
@@ -194,13 +210,27 @@ const App = () => {
     setCurrentView(view);
   };
 
+  const handleMenuClick = () => {
+    setShowMobileSidebar(true);
+  };
+
+  const handleCompose = () => {
+    setShowModal(true);
+  };
+
   const renderMainContent = () => {
     switch (currentView) {
       case 'home':
         return (
-          <div className="min-h-screen">
-            <Header title="Home" />
-            <TweetComposer currentUser={currentUser} onTweet={handleTweet} />
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Home" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            {!isMobile && (
+              <TweetComposer currentUser={currentUser} onTweet={handleTweet} />
+            )}
             <div className="divide-y divide-gray-800">
               {tweets.map(tweet => (
                 <Tweet
@@ -210,6 +240,7 @@ const App = () => {
                   onLike={handleLike}
                   onRetweet={handleRetweet}
                   onReply={handleReply}
+                  isMobile={isMobile}
                 />
               ))}
             </div>
@@ -217,17 +248,21 @@ const App = () => {
         );
       case 'explore':
         return (
-          <div className="min-h-screen">
-            <SearchBar onSearch={handleSearch} />
-            <Header title="Explore" />
-            <div className="p-4">
-              <h2 className="text-2xl font-bold mb-4">Trending now</h2>
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <SearchBar onSearch={handleSearch} isMobile={isMobile} />
+            <Header 
+              title="Explore" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
+              <h2 className={`font-bold mb-4 ${isMobile ? 'text-xl' : 'text-2xl'}`}>Trending now</h2>
               <div className="space-y-4">
                 {trendingTopics.map((trend, index) => (
-                  <div key={index} className="p-4 border border-gray-800 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer">
-                    <p className="text-gray-500 text-sm">{trend.category}</p>
-                    <h3 className="font-bold text-lg">{trend.title}</h3>
-                    <p className="text-gray-500 text-sm">{trend.posts} posts</p>
+                  <div key={index} className={`${isMobile ? 'p-3' : 'p-4'} border border-gray-800 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer`}>
+                    <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{trend.category}</p>
+                    <h3 className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>{trend.title}</h3>
+                    <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>{trend.posts} posts</p>
                   </div>
                 ))}
               </div>
@@ -236,59 +271,75 @@ const App = () => {
         );
       case 'notifications':
         return (
-          <div className="min-h-screen">
-            <Header title="Notifications" />
-            <div className="p-4">
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Notifications" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <p className="text-gray-500">No new notifications</p>
             </div>
           </div>
         );
       case 'messages':
         return (
-          <div className="min-h-screen">
-            <Header title="Messages" />
-            <div className="p-4">
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Messages" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <p className="text-gray-500">No messages yet</p>
             </div>
           </div>
         );
       case 'bookmarks':
         return (
-          <div className="min-h-screen">
-            <Header title="Bookmarks" />
-            <div className="p-4">
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Bookmarks" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <p className="text-gray-500">No bookmarks yet</p>
             </div>
           </div>
         );
       case 'profile':
         return (
-          <div className="min-h-screen">
-            <Header title="Profile" />
-            <div className="p-4">
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Profile" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center space-x-4 mb-6">
                 <img 
                   src={currentUser.avatar} 
                   alt={currentUser.name} 
-                  className="w-20 h-20 rounded-full"
+                  className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full`}
                 />
                 <div>
-                  <h2 className="text-2xl font-bold">{currentUser.name}</h2>
-                  <p className="text-gray-500">@{currentUser.username}</p>
+                  <h2 className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl'}`}>{currentUser.name}</h2>
+                  <p className={`text-gray-500 ${isMobile ? 'text-sm' : 'text-base'}`}>@{currentUser.username}</p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <p className="font-bold text-lg">123</p>
-                  <p className="text-gray-500">Following</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>123</p>
+                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Following</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-bold text-lg">456</p>
-                  <p className="text-gray-500">Followers</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>456</p>
+                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Followers</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-bold text-lg">789</p>
-                  <p className="text-gray-500">Posts</p>
+                  <p className={`font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>789</p>
+                  <p className={`text-gray-500 ${isMobile ? 'text-xs' : 'text-sm'}`}>Posts</p>
                 </div>
               </div>
             </div>
@@ -296,9 +347,13 @@ const App = () => {
         );
       default:
         return (
-          <div className="min-h-screen">
-            <Header title="Home" />
-            <div className="p-4">
+          <div className="min-h-screen pb-20 lg:pb-0">
+            <Header 
+              title="Home" 
+              onMenuClick={handleMenuClick} 
+              isMobile={isMobile}
+            />
+            <div className={`${isMobile ? 'p-3' : 'p-4'}`}>
               <p className="text-gray-500">Coming soon...</p>
             </div>
           </div>
@@ -310,12 +365,22 @@ const App = () => {
     <BrowserRouter>
       <div className="bg-black text-white min-h-screen">
         <div className="max-w-6xl mx-auto flex">
+          {/* Desktop Sidebar */}
           <Sidebar 
             currentUser={currentUser} 
             onNavigate={handleNavigation}
           />
           
-          <main className="flex-1 ml-64 mr-80 border-x border-gray-800">
+          {/* Mobile Sidebar */}
+          <MobileSidebar 
+            isOpen={showMobileSidebar}
+            onClose={() => setShowMobileSidebar(false)}
+            currentUser={currentUser}
+            onNavigate={handleNavigation}
+          />
+          
+          {/* Main Content */}
+          <main className={`flex-1 ${isMobile ? 'w-full' : 'lg:ml-64 xl:mr-80'} ${!isMobile ? 'border-x border-gray-800' : ''}`}>
             <Routes>
               <Route path="/" element={renderMainContent()} />
               <Route path="/explore" element={renderMainContent()} />
@@ -326,6 +391,7 @@ const App = () => {
             </Routes>
           </main>
           
+          {/* Desktop Right Sidebar */}
           <aside className="fixed right-0 top-0 h-screen overflow-y-auto">
             <RightSidebar 
               trends={trendingTopics}
@@ -334,8 +400,16 @@ const App = () => {
           </aside>
         </div>
 
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav 
+          currentView={currentView}
+          onNavigate={handleNavigation}
+          onCompose={handleCompose}
+        />
+
+        {/* Compose Modal */}
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-          <TweetComposer currentUser={currentUser} onTweet={handleTweet} />
+          <TweetComposer currentUser={currentUser} onTweet={handleTweet} isMobile={isMobile} />
         </Modal>
       </div>
     </BrowserRouter>
